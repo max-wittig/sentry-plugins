@@ -132,6 +132,7 @@ class JiraPlugin(CorePluginMixin, IssuePlugin2):
         return issue_type_meta
 
     def get_new_issue_fields(self, request, group, event, **kwargs):
+        logger = logging.getLogger(__name__)
         fields = super(JiraPlugin, self).get_new_issue_fields(request, group, event, **kwargs)
 
         jira_project_key = self.get_option('default_project', group.project)
@@ -139,7 +140,10 @@ class JiraPlugin(CorePluginMixin, IssuePlugin2):
         client = self.get_jira_client(group.project)
         try:
             meta = client.get_create_meta_for_project(jira_project_key)
-        except ApiUnauthorized:
+        except Exception as e:
+            logger.error(self.title, extra={
+                'tags':{'plugin': self.title}
+            })
             raise PluginError(
                 'JIRA returned: Unauthorized. '
                 'Please check your username, password, '
