@@ -38,6 +38,7 @@ install_requires = [
     'mistune',
     'phabricator>=0.6.0,<1.0',
     'python-dateutil',
+    'python-gitlab',
     'PyJWT',
     'requests-oauthlib>=0.3.0',
     'unidiff>=0.5.4'

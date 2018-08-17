@@ -100,7 +100,7 @@ class GitLabPlugin(CorePluginMixin, IssuePlugin2):
                 repo, {
                     'title': form_data['title'],
                     'description': form_data['description'],
-                    'labels': form_data.get('labels'),
+                    'labels': [form_data.get('labels')],
                     'assignee_id': form_data.get('assignee'),
                 }
             )
