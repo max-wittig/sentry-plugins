@@ -46,8 +46,22 @@ class GitLabClient(object):
         except GitlabCreateError as e:
             raise ApiError('Could not create note', e.response_code)
 
+    def get_group_members(self, current_group, members):
+        members += current_group.members.list(all=True)
+        if not current_group.parent_id:
+            return members
+        parent_group = self.gl.groups.get(current_group.parent_id)
+        return self.get_group_members(parent_group, members)
+
     def list_project_members(self, repo):
-        return [
-            member.attributes for member in
-            self.gl.projects.get(repo).members.list(all=True)
-        ]
+        project = self.gl.projects.get(repo)
+        members = []
+        if project.namespace['kind'] == 'group':
+            group = self.gl.groups.get(project.namespace['id'])
+            members = self.get_group_members(
+                group, members
+            )
+        members += project.members.list(all=True)
+        # to remove duplicates
+        members = {member.id: member.attributes for member in members}.values()
+        return sorted(members, key=lambda x: x['username'])
